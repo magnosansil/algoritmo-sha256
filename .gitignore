@@ -1,0 +1,8 @@
+# Arquivos gerados pela compilação local
+out/
+*.class
+
+# Configurações comuns de IDE
+.idea/
+*.iml
+.vscode/
