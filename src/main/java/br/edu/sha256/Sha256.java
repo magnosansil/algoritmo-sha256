@@ -1,6 +1,8 @@
 package br.edu.sha256;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementação didática do algoritmo SHA-256 conforme a especificação
@@ -76,6 +78,28 @@ public final class Sha256 {
     }
 
     /**
+     * Executa o mesmo algoritmo de {@link #hash(String)}, preservando dados
+     * intermediários para fins didáticos e de visualização.
+     *
+     * @param message mensagem em texto, convertida para UTF-8
+     * @return rastreamento completo da execução
+     */
+    public static Sha256Trace explain(String message) {
+        byte[] original = message.getBytes(StandardCharsets.UTF_8);
+        byte[] padded = pad(original);
+        int[] hash = INITIAL_HASH.clone();
+        List<Sha256Trace.BlockTrace> blocks = new ArrayList<>();
+
+        for (int offset = 0; offset < padded.length; offset += BLOCK_SIZE_BYTES) {
+            blocks.add(processBlockWithTrace(padded, offset, hash, blocks.size()));
+        }
+
+        return new Sha256Trace(message, bytesToHex(original), original.length,
+                Math.multiplyExact((long) original.length, 8L), bytesToHex(padded),
+                padded.length, blocks, toHex(hash));
+    }
+
+    /**
      * Adiciona o bit 1, zeros e o tamanho original em 64 bits big-endian.
      * O resultado sempre possui tamanho múltiplo de 512 bits.
      */
@@ -122,6 +146,45 @@ public final class Sha256 {
         hash[5] += f;
         hash[6] += g;
         hash[7] += h;
+    }
+
+    /** Processa um bloco e registra o estado antes e depois de cada rodada. */
+    private static Sha256Trace.BlockTrace processBlockWithTrace(byte[] block, int offset,
+            int[] hash, int blockIndex) {
+        int[] words = expandMessage(block, offset);
+        List<String> wordHex = new ArrayList<>(64);
+        for (int word : words) {
+            wordHex.add(String.format("%08x", word));
+        }
+        String initialHash = toHex(hash);
+        List<Sha256Trace.RoundTrace> rounds = new ArrayList<>(64);
+        int a = hash[0], b = hash[1], c = hash[2], d = hash[3];
+        int e = hash[4], f = hash[5], g = hash[6], h = hash[7];
+
+        for (int round = 0; round < 64; round++) {
+            int t1 = h + bigSigma1(e) + choose(e, f, g) + ROUND_CONSTANTS[round] + words[round];
+            int t2 = bigSigma0(a) + majority(a, b, c);
+            int nextA = t1 + t2;
+            int nextB = a;
+            int nextC = b;
+            int nextD = c;
+            int nextE = d + t1;
+            int nextF = e;
+            int nextG = f;
+            int nextH = g;
+
+            rounds.add(new Sha256Trace.RoundTrace(round,
+                    String.format("%08x", ROUND_CONSTANTS[round]), wordHex.get(round),
+                    a, b, c, d, e, f, g, h, t1, t2,
+                    nextA, nextB, nextC, nextD, nextE, nextF, nextG, nextH));
+            a = nextA; b = nextB; c = nextC; d = nextD;
+            e = nextE; f = nextF; g = nextG; h = nextH;
+        }
+
+        hash[0] += a; hash[1] += b; hash[2] += c; hash[3] += d;
+        hash[4] += e; hash[5] += f; hash[6] += g; hash[7] += h;
+        return new Sha256Trace.BlockTrace(blockIndex, bytesToHex(block, offset, BLOCK_SIZE_BYTES),
+                initialHash, toHex(hash), wordHex, rounds);
     }
 
     /** Converte as 16 palavras iniciais do bloco nas 64 palavras da rodada. */
@@ -176,6 +239,20 @@ public final class Sha256 {
         StringBuilder result = new StringBuilder(HASH_WORDS * 8);
         for (int word : hash) {
             result.append(String.format("%08x", word));
+        }
+        return result.toString();
+    }
+
+    /** Converte todos os bytes para hexadecimal, sem separadores. */
+    private static String bytesToHex(byte[] bytes) {
+        return bytesToHex(bytes, 0, bytes.length);
+    }
+
+    /** Converte uma faixa de bytes para hexadecimal, sem alterar os bytes. */
+    private static String bytesToHex(byte[] bytes, int offset, int length) {
+        StringBuilder result = new StringBuilder(length * 2);
+        for (int i = offset; i < offset + length; i++) {
+            result.append(String.format("%02x", bytes[i] & 0xff));
         }
         return result.toString();
     }
