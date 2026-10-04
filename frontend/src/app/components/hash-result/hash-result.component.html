@@ -1,0 +1,17 @@
+<section class="card result-card" *ngIf="hash">
+  <div class="result-heading">
+    <div>
+      <p class="eyebrow">Resultado</p>
+      <h2>Resumo criptográfico</h2>
+    </div>
+    <span class="badge">256 bits</span>
+  </div>
+  <code>{{ hash }}</code>
+  <button class="copy-button" type="button" (click)="copy()">
+    {{ copied ? "Copiado!" : "Copiar hash" }}
+  </button>
+  <p class="note">
+    SHA-256 é uma função hash: o resumo não é uma mensagem criptografada e não
+    pode ser revertido de forma prática.
+  </p>
+</section>

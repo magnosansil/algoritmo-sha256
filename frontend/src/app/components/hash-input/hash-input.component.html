@@ -1,0 +1,33 @@
+<section class="card input-card">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Entrada</p>
+      <h2>Digite uma mensagem</h2>
+    </div>
+    <span class="badge">UTF-8</span>
+  </div>
+  <form (ngSubmit)="submit()" class="form">
+    <label for="message">Mensagem a ser transformada</label>
+    <textarea
+      id="message"
+      name="message"
+      [(ngModel)]="message"
+      rows="5"
+      placeholder="Ex.: abc"
+    ></textarea>
+    <div class="actions">
+      <button class="primary" type="submit">Gerar hash</button>
+      <button class="secondary" type="button" (click)="clear()">Limpar</button>
+    </div>
+  </form>
+  <div class="examples">
+    <span>Exemplos:</span>
+    <button
+      type="button"
+      *ngFor="let example of examples"
+      (click)="useExample(example)"
+    >
+      {{ example }}
+    </button>
+  </div>
+</section>

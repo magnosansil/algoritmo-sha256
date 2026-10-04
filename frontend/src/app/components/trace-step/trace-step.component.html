@@ -1,0 +1,59 @@
+<article class="trace-step">
+  <button
+    class="step-header"
+    type="button"
+    (click)="toggle()"
+    [attr.aria-expanded]="open"
+  >
+    <span class="step-number">{{ id === "rounds" ? "64" : "•" }}</span>
+    <span class="step-title"
+      ><strong>{{ title }}</strong
+      ><small>{{ description }}</small></span
+    >
+    <span class="chevron">{{ open ? "−" : "+" }}</span>
+  </button>
+  <div class="step-body" *ngIf="open">
+    <ng-container [ngSwitch]="id">
+      <div *ngSwitchCase="'message'">
+        <p class="value">{{ trace.message || "(mensagem vazia)" }}</p>
+      </div>
+      <div *ngSwitchCase="'bytes'">
+        <p>
+          <strong>{{ trace.messageByteLength }}</strong> bytes /
+          <strong>{{ trace.messageBitLength }}</strong> bits
+        </p>
+        <code>{{ trace.messageUtf8Hex || "(vazio)" }}</code>
+      </div>
+      <div *ngSwitchCase="'padding'">
+        <p>{{ trace.paddedByteLength }} bytes após o padding.</p>
+        <code>{{ preview(trace.paddedMessageHex) }}</code>
+      </div>
+      <div *ngSwitchCase="'blocks'" class="block-list">
+        <div *ngFor="let block of trace.blocks" class="mini-block">
+          <strong>Bloco {{ block.index + 1 }}</strong
+          ><span>{{ block.bytesHex }}</span>
+        </div>
+      </div>
+      <div *ngSwitchCase="'expansion'">
+        <p>W[0] até W[63] para cada bloco.</p>
+        <div *ngFor="let block of trace.blocks" class="words">
+          <strong>Bloco {{ block.index + 1 }}</strong
+          ><code>{{ block.words.join("  ") }}</code>
+        </div>
+      </div>
+      <app-round-table
+        *ngSwitchCase="'rounds'"
+        [blocks]="trace.blocks"
+      ></app-round-table>
+      <div *ngSwitchCase="'state'" class="state-list">
+        <div *ngFor="let block of trace.blocks">
+          <strong>Bloco {{ block.index + 1 }}</strong
+          ><code>{{ block.initialHash }} → {{ block.finalHash }}</code>
+        </div>
+      </div>
+      <div *ngSwitchCase="'result'">
+        <code class="final-hash">{{ trace.hash }}</code>
+      </div>
+    </ng-container>
+  </div>
+</article>

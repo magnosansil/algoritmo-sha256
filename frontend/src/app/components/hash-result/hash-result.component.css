@@ -1,0 +1,49 @@
+.result-card {
+  border-color: #34786e;
+  background: linear-gradient(135deg, #122b32, #122238);
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+}
+.result-card .eyebrow {
+  margin-top: 0;
+}
+.result-card h2 {
+  margin: 0;
+}
+.result-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+code {
+  display: block;
+  overflow-wrap: anywhere;
+  color: #8ce8d7;
+  font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+  line-height: 1.7;
+}
+.copy-button {
+  background: #65d5c2;
+  color: #08231f;
+  font-weight: 700;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  width: fit-content;
+}
+.note {
+  color: #b7c9d8;
+  font-size: 0.86rem;
+  margin: 0;
+}
+.badge {
+  border: 1px solid #3b806f;
+  color: #8ce8d7;
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+}

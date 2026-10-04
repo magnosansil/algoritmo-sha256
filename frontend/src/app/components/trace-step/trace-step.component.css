@@ -1,0 +1,74 @@
+.trace-step {
+  border: 1px solid #263853;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #111d30;
+}
+.step-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-align: left;
+  background: transparent;
+  color: #eff4fb;
+  border: 0;
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+}
+.step-header:hover {
+  background: #172640;
+}
+.step-number {
+  color: #65d5c2;
+  font-weight: 800;
+  min-width: 1.4rem;
+  text-align: center;
+}
+.step-title {
+  display: grid;
+  gap: 0.2rem;
+  flex: 1;
+}
+.step-title small {
+  color: #91a2bb;
+  font-weight: 400;
+}
+.chevron {
+  color: #65d5c2;
+  font-size: 1.3rem;
+}
+.step-body {
+  border-top: 1px solid #263853;
+  padding: 1rem 1.1rem;
+  color: #c1cfdf;
+  display: grid;
+  gap: 0.8rem;
+}
+code,
+.value {
+  color: #a8e9dd;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+.mini-block,
+.state-list > div,
+.words {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.8rem;
+  background: #0d1524;
+  border-radius: 9px;
+  margin-bottom: 0.6rem;
+}
+.mini-block span {
+  color: #9fb1c7;
+  font:
+    0.78rem/1.5 "Cascadia Code",
+    Consolas,
+    monospace;
+  overflow-wrap: anywhere;
+}
+.final-hash {
+  font-size: 1.05rem;
+}

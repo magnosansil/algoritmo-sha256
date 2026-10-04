@@ -1,0 +1,44 @@
+<div *ngIf="blocks.length" class="round-viewer">
+  <div class="table-controls">
+    <label for="block">Bloco:</label>
+    <select id="block" [(ngModel)]="selectedBlock">
+      <option *ngFor="let block of blocks; let i = index" [ngValue]="i">
+        {{ block.index + 1 }} / {{ blocks.length }}
+      </option>
+    </select>
+    <label class="toggle"
+      ><input type="checkbox" [(ngModel)]="showAfter" /> mostrar estado
+      seguinte</label
+    >
+  </div>
+  <div class="table-wrap" *ngIf="block">
+    <table>
+      <thead>
+        <tr>
+          <th>t</th>
+          <th>K[t]</th>
+          <th>W[t]</th>
+          <th>a</th>
+          <th>e</th>
+          <th>T1</th>
+          <th>T2</th>
+          <th>próximo a</th>
+          <th>próximo e</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let round of block.rounds">
+          <td>{{ round.round }}</td>
+          <td>{{ round.constant }}</td>
+          <td>{{ round.word }}</td>
+          <td>{{ showAfter ? round.nextA : round.a }}</td>
+          <td>{{ showAfter ? round.nextE : round.e }}</td>
+          <td>{{ round.t1 }}</td>
+          <td>{{ round.t2 }}</td>
+          <td>{{ round.nextA }}</td>
+          <td>{{ round.nextE }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

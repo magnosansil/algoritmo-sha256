@@ -1,0 +1,57 @@
+<main class="page-shell">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Segurança de Redes · laboratório visual</p>
+      <h1>SHA-256 <span>por dentro</span></h1>
+      <p class="hero-copy">
+        Acompanhe como uma mensagem UTF-8 passa pelo padding, pelos blocos de
+        512 bits e pelas 64 rodadas até virar um resumo de 256 bits.
+      </p>
+    </div>
+    <div class="hero-mark">256<br /><small>bits</small></div>
+  </header>
+
+  <div class="notice">
+    <strong>Função hash criptográfica.</strong> SHA-256 não é criptografia
+    reversível: ele produz um resumo para verificação de integridade e não
+    permite recuperar a mensagem original na prática.
+  </div>
+
+  <app-hash-input
+    (submitted)="calculate($event)"
+    (cleared)="clear()"
+  ></app-hash-input>
+  <div class="status loading" *ngIf="loading">
+    <span class="spinner"></span> Processando os blocos e as rodadas…
+  </div>
+  <div class="status error" *ngIf="error">{{ error }}</div>
+  <app-hash-result
+    class="result"
+    *ngIf="trace"
+    [hash]="trace!.hash"
+  ></app-hash-result>
+
+  <section class="trace-section" *ngIf="trace">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Visualização guiada</p>
+        <h2>Etapas da execução</h2>
+      </div>
+      <span class="hint">Clique em uma etapa para expandir</span>
+    </div>
+    <div class="steps">
+      <app-trace-step
+        *ngFor="let step of trace.steps"
+        [id]="step.id"
+        [title]="step.title"
+        [description]="step.description"
+        [trace]="trace!"
+      ></app-trace-step>
+    </div>
+  </section>
+
+  <footer>
+    Implementação didática Java + interface Angular · os valores exibidos vêm do
+    algoritmo manual, sem MessageDigest no cálculo.
+  </footer>
+</main>
