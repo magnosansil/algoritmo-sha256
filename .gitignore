@@ -6,3 +6,8 @@ out/
 .idea/
 *.iml
 .vscode/
+
+# Dependências e artefatos do frontend Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/

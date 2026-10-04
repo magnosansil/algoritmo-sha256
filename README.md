@@ -13,12 +13,18 @@ Hash não é criptografia reversível: não existe chave de descriptografia nem 
 ```text
 projeto-sha256/
 ├── README.md
-└── src/
+├── src/
     ├── main/java/br/edu/sha256/
     │   ├── Sha256.java
     │   └── Sha256Demo.java
     └── test/java/br/edu/sha256/
         └── Sha256Test.java
+└── frontend/
+    ├── package.json
+    └── src/app/
+        ├── components/
+        ├── models/
+        └── services/
 ```
 
 ## 3. Como compilar e executar
@@ -48,6 +54,44 @@ No PowerShell, também é possível configurar explicitamente a entrada e a saí
 ```
 
 Isso evita que caracteres como `á`, `ç` e `ã` sejam substituídos por `�` antes de serem transformados em bytes pelo programa.
+
+### Executar a API Java
+
+Compile o backend e inicialize o servidor HTTP embutido:
+
+```powershell
+javac -encoding UTF-8 -d out src/main/java/br/edu/sha256/*.java
+java -cp out br.edu.sha256.Sha256ApiServer
+```
+
+A API ficará disponível em `http://localhost:8080/api/hash`. É possível escolher outra porta informando-a como argumento, por exemplo `java -cp out br.edu.sha256.Sha256ApiServer 8090`.
+
+### Executar o frontend Angular
+
+Requer Node.js 18 ou superior:
+
+```powershell
+Set-Location frontend
+npm install
+npm start
+```
+
+Acesse `http://localhost:4200`. A URL do backend fica em `frontend/src/environments/environment.ts` e pode ser alterada sem modificar os componentes.
+
+O projeto pode ser utilizado de duas formas independentes:
+
+- **Somente pelo terminal:** execute `Sha256Demo` para informar mensagens interativamente ou `Sha256ApiServer` para testar a API REST sem instalar Node.js ou Angular.
+- **Pela interface web:** execute a API Java e, em outro terminal, inicie o frontend Angular com `npm start`. A interface enviará as mensagens para o backend e exibirá as etapas do algoritmo.
+
+Para testar a API sem o frontend, use o PowerShell:
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri http://localhost:8080/api/hash `
+  -ContentType "application/json" `
+  -Body '{"message":"abc"}'
+```
 
 ## 4. Funcionamento do algoritmo
 
@@ -93,8 +137,42 @@ Depois das 64 rodadas, `a` até `h` são somados ao estado acumulado. Ao termina
 - `Sha256`: classe utilitária pública. `hash(String)` trata texto UTF-8; `hash(byte[])` trata bytes; `pad` faz o preenchimento; `processBlock` executa as rodadas; `expandMessage` monta as 64 palavras; os métodos `choose`, `majority`, `bigSigma*` e `smallSigma*` representam as fórmulas oficiais; `toHex` produz o resultado final.
 - `Sha256Demo`: mostra um exemplo e lê mensagens do usuário até receber `sair`.
 - `Sha256Test`: verifica vetores conhecidos e compara mensagens longas e Unicode com `MessageDigest`.
+- `Sha256Trace`: modelo imutável com bytes, padding, blocos, palavras, estados e rodadas.
+- `Sha256ApiServer`: API REST Java baseada no `HttpServer` do JDK. O cálculo passa por `Sha256.explain`, sem `MessageDigest`.
+- `Sha256Json`: serializa a resposta sem dependências externas.
 
-## 6. Resultados esperados
+## 6. Integração web
+
+O frontend envia `POST /api/hash` com o corpo:
+
+```json
+{"message":"abc"}
+```
+
+A resposta contém `hash`, `messageUtf8Hex`, `messageByteLength`, `messageBitLength`, `paddedMessageHex`, `blocks` e `steps`. Cada bloco possui `words` com W[0] até W[63] e `rounds` com K[t], W[t], a até h, T1, T2 e os valores seguintes.
+
+Os componentes Angular são separados por responsabilidade: `HashInputComponent` recebe a mensagem e exemplos; `HashResultComponent` exibe e copia o hash; `TraceStepComponent` expande cada etapa; `RoundTableComponent` permite selecionar o bloco e visualizar as 64 rodadas. `Sha256ApiService` é o único componente responsável pela comunicação HTTP.
+
+## 7. Testes
+
+Backend:
+
+```powershell
+javac -encoding UTF-8 -d out src/main/java/br/edu/sha256/*.java src/test/java/br/edu/sha256/*.java
+java -cp out br.edu.sha256.Sha256Test
+java -cp out br.edu.sha256.Sha256TraceTest
+```
+
+Frontend:
+
+```powershell
+Set-Location frontend
+npm test
+```
+
+Os testes Angular verificam o payload enviado pelo service, a propagação de erro de comunicação e a emissão da mensagem pelo componente de entrada.
+
+## 8. Resultados esperados
 
 ```text
 ""            e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -104,12 +182,12 @@ Depois das 64 rodadas, `a` até `h` são somados ao estado acumulado. Ao termina
 
 O teste de `abc` é um vetor clássico. O caso longo usa `abc` repetido 1000 vezes e é comparado com a implementação confiável da biblioteca padrão. A validação não participa do cálculo principal.
 
-## 7. Complexidade e limitações
+## 9. Complexidade e limitações
 
 Para uma mensagem de `n` bytes, o tempo é O(n), pois todos os bytes são processados em blocos. O espaço auxiliar é O(1) em relação ao tamanho da mensagem durante o processamento, além de um bloco preenchido e 64 palavras. O SHA-256 é resistente a colisões conhecido atualmente em nível prático, mas nenhum hash elimina matematicamente colisões. Não deve ser usado sozinho para armazenar senhas, e integridade com origem autenticada exige uma MAC, como HMAC-SHA-256.
 
 Aplicações incluem verificação de integridade de arquivos, assinaturas digitais, certificados, HMAC, identificação de conteúdo e componentes de protocolos. Em sistemas reais, deve-se preferir uma biblioteca criptográfica auditada; esta implementação é para aprendizagem.
 
-## 8. Possíveis erros durante a implementação
+## 10. Possíveis erros durante a implementação
 
 Os erros mais comuns são esquecer que o comprimento é em bits, gravá-lo em little-endian, omitir `& 0xff` ao montar uma palavra a partir de bytes, usar `>>` em vez de `>>>`, confundir rotação com deslocamento e atualizar as variáveis `a` até `h` na ordem errada. Outro erro é usar caracteres Java diretamente como se cada caractere fosse um byte; por isso o projeto explicita UTF-8.
