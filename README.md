@@ -31,6 +31,24 @@ java -cp out br.edu.sha256.Sha256Test
 java -cp out br.edu.sha256.Sha256Demo
 ```
 
+### Windows e caracteres especiais
+
+Como o programa lê mensagens em UTF-8, configure o terminal do Windows antes de executar a demonstração interativa:
+
+```powershell
+chcp 65001
+java -cp out br.edu.sha256.Sha256Demo
+```
+
+No PowerShell, também é possível configurar explicitamente a entrada e a saída da sessão:
+
+```powershell
+[Console]::InputEncoding = [System.Text.UTF8Encoding]::new()
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+```
+
+Isso evita que caracteres como `á`, `ç` e `ã` sejam substituídos por `�` antes de serem transformados em bytes pelo programa.
+
 ## 4. Funcionamento do algoritmo
 
 ### Conversão, padding e comprimento
@@ -95,17 +113,3 @@ Aplicações incluem verificação de integridade de arquivos, assinaturas digit
 ## 8. Possíveis erros durante a implementação
 
 Os erros mais comuns são esquecer que o comprimento é em bits, gravá-lo em little-endian, omitir `& 0xff` ao montar uma palavra a partir de bytes, usar `>>` em vez de `>>>`, confundir rotação com deslocamento e atualizar as variáveis `a` até `h` na ordem errada. Outro erro é usar caracteres Java diretamente como se cada caractere fosse um byte; por isso o projeto explicita UTF-8.
-
-## 9. Roteiro para apresentação e vídeo
-
-1. Apresentem o objetivo: hash de 256 bits, sem descriptografia e sem `MessageDigest` no cálculo principal.
-2. Mostrem a estrutura de arquivos e executem o teste, destacando os vetores vazio, `abc` e `hello world`.
-3. Expliquem UTF-8, o `0x80`, os zeros e os 64 bits finais do padding. Desenhem um bloco de 512 bits.
-4. Mostrem `expandMessage` e expliquem como 16 palavras se tornam 64.
-5. Apresentem `Ch`, `Maj`, as quatro funções sigma e a diferença entre rotação e deslocamento.
-6. Percorram `processBlock`, exibindo `T1`, `T2` e a atualização de `a` até `h`. Expliquem o overflow modular de 32 bits.
-7. Mostrem `toHex` e o resumo final. Alterem uma letra da mensagem para demonstrar o efeito avalanche.
-8. Executem `Sha256Demo`, digitem uma mensagem e depois comparem o resultado com uma ferramenta ou `MessageDigest` apenas para validação.
-9. Encerrem com aplicações, complexidade, limitações e a recomendação de usar bibliotecas auditadas em produção.
-
-Uma divisão simples entre a dupla é: uma pessoa explica conceitos, padding e expansão; a outra explica as rodadas, demonstra a execução e apresenta os testes.

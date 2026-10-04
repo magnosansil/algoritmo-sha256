@@ -15,6 +15,7 @@ public final class Sha256Test {
         assertHash("", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
         assertHash("abc", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
         assertHash("hello world", "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9");
+        assertHash("olá", "9b186e077c7c6d044f5789d76e6d8070a5b0aaa902ebc608bc34170722dba903");
 
         String longMessage = "abc".repeat(1000);
         assertHash(longMessage, trustedHash(longMessage));
